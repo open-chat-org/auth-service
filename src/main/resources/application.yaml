@@ -1,0 +1,11 @@
+jwt:
+  secret: Hello world
+  expiration: 86400
+
+spring:
+  neo4j:
+    uri: neo4j://localhost:7687
+  data:
+    neo4j:
+      username: neo4j
+      password: secret
