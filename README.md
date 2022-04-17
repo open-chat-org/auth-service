@@ -3,5 +3,6 @@
 ## TODO
 
 - [ ] Handle exception in Webflux
-- [ ] Store token in Redis
 - [ ] Add refresh token
+- [ ] Add test cases
+- [ ] Validate input

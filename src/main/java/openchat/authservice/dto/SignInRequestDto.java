@@ -1,5 +1,6 @@
 package openchat.authservice.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
@@ -8,7 +9,8 @@ import lombok.Data;
 public class SignInRequestDto {
 
     @NotBlank
-    private String mail;
+    @Email
+    private String email;
 
     @NotBlank
     private String password;

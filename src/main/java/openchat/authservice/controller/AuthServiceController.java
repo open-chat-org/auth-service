@@ -2,10 +2,11 @@ package openchat.authservice.controller;
 
 import java.util.HashMap;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +34,9 @@ public class AuthServiceController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/v0.1/auth/sign-in")
+    @PostMapping("/v1.0/auth/sign-in")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<ResponseEntity<ResponseModel>> signIn(@RequestBody SignInRequestDto request) {
+    public Mono<ResponseEntity<ResponseModel>> signIn(@Valid @RequestBody SignInRequestDto request) {
         try {
             return authService.signIn(request)
                 .map(user -> {
@@ -53,9 +54,9 @@ public class AuthServiceController {
         }
     }
 
-    @PostMapping("/v0.1/auth/sign-up")
+    @PostMapping("/v1.0/auth/sign-up")
     @ResponseStatus(code = HttpStatus.OK)
-    public Mono<ResponseEntity<ResponseModel>> signUp(@RequestBody SignUpRequestDto request) {
+    public Mono<ResponseEntity<ResponseModel>> signUp(@Valid @RequestBody SignUpRequestDto request) {
         try {
             authService.signUp(request);
 
@@ -65,13 +66,5 @@ public class AuthServiceController {
             log.error("Can not sign in", error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not auth user", error);
         }
-    }
-
-    @GetMapping("/v0.1/auth/ping")
-    public Mono<ResponseEntity<ResponseModel>> ping() {
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("message", "pong");
-
-        return Mono.just(ResponseEntity.ok(new ResponseModel(200, ResponseMessage.SUCCESSFUL, response)));
     }
 }

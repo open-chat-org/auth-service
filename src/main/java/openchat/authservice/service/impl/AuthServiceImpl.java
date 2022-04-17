@@ -23,15 +23,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void signUp(SignUpRequestDto request) throws Exception {
-        String mail = request.getMail();
-        UserModel existUser = authRepository.findByMail(mail);
+        String username = request.getUsername();
+        UserModel existUserName = authRepository.findByUsername(username);
+        if (existUserName != null) {
+            throw new Exception("Username exist");
+        }
+
+        String email = request.getEmail();
+        UserModel existUser = authRepository.findByEmail(email);
         if (existUser != null) {
             throw new Exception("User exist");
         }
 
         UserModel userModel = new UserModel();
-        userModel.setUsername(request.getUsername());
-        userModel.setMail(request.getMail());
+        userModel.setUsername(username);
+        userModel.setEmail(email);
 
         String password = request.getPassword();
         String hashPassword = passwordEncoder.encode(password);
@@ -42,10 +48,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Mono<User> signIn(SignInRequestDto request) throws Exception {
-        String mail = request.getMail();
-        UserModel userModel = authRepository.findByMail(mail);
+        String email = request.getEmail();
+        UserModel userModel = authRepository.findByEmail(email);
         if (userModel == null) {
-            throw new Exception("User not exist");
+            throw new Exception("Wrong username or password");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), userModel.getPassword())) {
@@ -53,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = new User();
-        user.setMail(mail);
+        user.setMail(email);
         user.setPassword(userModel.getPassword());
 
         return Mono.just(user);
