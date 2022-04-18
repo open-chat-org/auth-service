@@ -3,6 +3,6 @@
 ## TODO
 
 - [ ] Handle exception in Webflux
-- [ ] Add refresh token
+- [x] Add refresh token
 - [ ] Add test cases
-- [ ] Validate input
+- [x] Validate input

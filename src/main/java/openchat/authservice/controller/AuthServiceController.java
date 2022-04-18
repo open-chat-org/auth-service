@@ -1,6 +1,7 @@
 package openchat.authservice.controller;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -20,7 +21,6 @@ import openchat.authservice.dto.ResponseModel;
 import openchat.authservice.dto.SignInRequestDto;
 import openchat.authservice.dto.SignUpRequestDto;
 import openchat.authservice.service.AuthService;
-import openchat.authservice.util.JwtUtil;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -31,20 +31,12 @@ public class AuthServiceController {
     @Autowired
     private AuthService authService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @PostMapping("/v1.0/auth/sign-in")
     @ResponseStatus(code = HttpStatus.OK)
     public Mono<ResponseEntity<ResponseModel>> signIn(@Valid @RequestBody SignInRequestDto request) {
         try {
             return authService.signIn(request)
-                .map(user -> {
-                    String token = jwtUtil.generateToken(user);
-
-                    HashMap<String, Object> response = new HashMap<>();
-                    response.put("token", token);
-
+                .map(response -> {
                     return ResponseEntity.ok(new ResponseModel(200, ResponseMessage.SUCCESSFUL, response));
                 })
                 .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
@@ -62,6 +54,21 @@ public class AuthServiceController {
 
             ResponseModel responseModel = new ResponseModel(200, ResponseMessage.SUCCESSFUL, null);
             return Mono.just(ResponseEntity.ok(responseModel));
+        } catch (Exception error) {
+            log.error("Can not sign in", error);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not auth user", error);
+        }
+    }
+
+    @PostMapping("/v1.0/auth/refresh-token")
+    @ResponseStatus(code = HttpStatus.OK)
+    public Mono<ResponseEntity<ResponseModel>> refreshToken(@RequestBody HashMap<String, Object> request) {
+        try {
+            return authService.createRefreshToken(UUID.fromString((String) request.get("refreshToken")))
+                .map(response -> {
+                    return ResponseEntity.ok(new ResponseModel(200, ResponseMessage.SUCCESSFUL, response));
+                })
+            .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
         } catch (Exception error) {
             log.error("Can not sign in", error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not auth user", error);
