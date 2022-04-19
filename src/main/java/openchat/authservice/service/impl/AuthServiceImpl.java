@@ -53,6 +53,8 @@ public class AuthServiceImpl implements AuthService {
         UserModel userModel = new UserModel();
         userModel.setUsername(username);
         userModel.setEmail(email);
+        userModel.setAvatar("");
+        userModel.setProfile("");
 
         String password = request.getPassword();
         String hashPassword = passwordEncoder.encode(password);
